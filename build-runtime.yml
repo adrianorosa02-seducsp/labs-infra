@@ -1,0 +1,35 @@
+name: Build Inetz Runtime
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'Dockerfile' # Só dispara o build se você alterar a receita
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: 🛒 Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: 🔑 Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐳 Build e Push da Imagem
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Nome final: ghcr.io/ajustinorosa/inetz-python-runtime:latest
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/inetz-python-runtime:latest
+            ghcr.io/${{ github.repository_owner }}/inetz-python-runtime:${{ github.run_number }}
