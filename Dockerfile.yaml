@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir gunicorn flask poetry fastapi uvicorn
 WORKDIR /app
 
 # Expõe a porta que o Traefik vai escutar
-EXPOSE 8000
+EXPOSE 8005
 
 # Comando padrão: Inicia o servidor Gunicorn buscando o arquivo main.py
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--threads", "4", "main:app"]
