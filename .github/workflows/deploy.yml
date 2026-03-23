@@ -5,7 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'Dockerfile' # Só dispara o build se você alterar a receita
-
+      - '.github/workflows/**' # Agora ele roda se você mexer no robô também!
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
