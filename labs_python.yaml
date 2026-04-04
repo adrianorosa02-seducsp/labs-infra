@@ -537,7 +537,8 @@ services:
   lab29:
     image: ghcr.io/adrianorosa02-seducsp/inetz-python-runtime:latest
     volumes:
-      - /var/inetpub/wwwroot/lab29/:/app/:ro
+      #- /var/inetpub/wwwroot/lab29/:/app/:ro
+      - /var/inetpub/wwwroot/lab29:/app
     networks:
       - dockermaster
     deploy:
