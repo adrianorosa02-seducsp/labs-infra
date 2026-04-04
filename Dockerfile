@@ -1,19 +1,16 @@
-# Dockerfile
-FROM python:3.11-slim
+FROM python:3.13-slim
 
-# Evita que o Python gere arquivos .pyc e garante logs em tempo real.
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV POETRY_VIRTUALENVS_CREATE=false
 
-# Instala dependências globais básicas
-RUN pip install --no-cache-dir gunicorn flask poetry fastapi uvicorn
-
-# Define o diretório de trabalho dentro do container
 WORKDIR /app
 
-# Expõe a porta que o Traefik vai escutar
-EXPOSE 8005
+# Instalamos apenas o motor essencial
+RUN pip install --no-cache-dir "fastapi[standard]"
 
-# Comando padrão: Inicia o servidor Gunicorn buscando o arquivo main.py
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--threads", "4", "main:app"]
+# Porta padrão alinhada ao seu Traefik
+EXPOSE 8000
+
+# Comando direto, limpo e rápido
+# O '--proxy-headers' é importante porque você está atrás do Traefik (Reverse Proxy)
+CMD ["python", "-m", "uvicorn", "fast_zero.app:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
