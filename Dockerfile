@@ -1,21 +1,39 @@
 FROM python:3.13-slim
 
+# Configurações para Python não gerar lixo e logar em tempo real
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instala o poetry para gerenciar suas dependências reais
-RUN pip install poetry
+# Instalação dos módulos em uma única camada (otimização de tamanho)
+RUN pip install --no-cache-dir \
+    # Web Framework & Servidor
+    "fastapi[standard]" \
+    uvicorn \
+    python-multipart \
+    # Banco de Dados & Migrações
+    sqlalchemy \
+    alembic \
+    psycopg2-binary \
+    # Validação e Configurações
+    pydantic \
+    pydantic-settings \
+    python-dotenv \
+    # Segurança & Autenticação
+    "python-jose[cryptography]" \
+    "passlib[bcrypt]" \
+    # Integrações e Scrapping (O que você já usa)
+    requests \
+    beautifulsoup4 \
+    gspread \
+    google-auth \
+    # Utilidades
+    httpx \
+    tzdata
 
-# Copia os arquivos de dependência do SEU lab
-COPY pyproject.toml poetry.lock* /app/
+# Porta padrão para o Traefik
+EXPOSE 8000
 
-# Instala TUDO (SQLAlchemy, Pydantic, etc)
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --no-root
-
-COPY . /app
-
-# Comando com proxy-headers para o Traefik
+# Comando de inicialização padrão
 CMD ["python", "-m", "uvicorn", "fast_zero.app:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
