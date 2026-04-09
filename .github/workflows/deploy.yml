@@ -1,35 +1,23 @@
-name: Build Inetz Runtime
+FROM python:3.13-slim
 
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'Dockerfile' # Só dispara o build se você alterar a receita
-      - '.github/workflows/**' # Agora ele roda se você mexer no robô também!
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+# Removida a linha 'git push origin' que causava erro de build
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-    steps:
-      - name: 🛒 Checkout do Código
-        uses: actions/checkout@v4
+# Instalamos o Poetry para que a imagem saiba gerenciar os pacotes do aluno
+RUN pip install --no-cache-dir poetry
 
-      - name: 🔑 Login no GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+WORKDIR /app
 
-      - name: 🐳 Build e Push da Imagem
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          # Nome final: ghcr.io/ajustinorosa/inetz-python-runtime:latest
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/inetz-python-runtime:latest
-            ghcr.io/${{ github.repository_owner }}/inetz-python-runtime:${{ github.run_number }}
+# ESTRATÉGIA DE BUILD:
+# No momento do build (no servidor), o Docker vai olhar para a pasta do Lab.
+# Se houver um pyproject.toml lá, ele instala as dependências.
+ONBUILD COPY pyproject.toml poetry.lock* /app/
+ONBUILD RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi --no-root || true
+
+# Porta padrão do Traefik
+EXPOSE 8000
+
+# Comando com --proxy-headers para o Traefik
+CMD ["python", "-m", "uvicorn", "fast_zero.app:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
