@@ -1,15 +1,21 @@
 FROM python:3.13-slim
+
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instalamos apenas o motor essencial
-RUN pip install --no-cache-dir "fastapi[standard]"
+# Instala o poetry para gerenciar suas dependências reais
+RUN pip install poetry
 
-# Porta padrão alinhada ao seu Traefik
-EXPOSE 8000
+# Copia os arquivos de dependência do SEU lab
+COPY pyproject.toml poetry.lock* /app/
 
-# Comando direto, limpo e rápido
-# O '--proxy-headers' é importante porque você está atrás do Traefik (Reverse Proxy)
+# Instala TUDO (SQLAlchemy, Pydantic, etc)
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi --no-root
+
+COPY . /app
+
+# Comando com proxy-headers para o Traefik
 CMD ["python", "-m", "uvicorn", "fast_zero.app:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
