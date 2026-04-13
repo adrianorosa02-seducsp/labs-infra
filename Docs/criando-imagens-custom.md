@@ -1,6 +1,6 @@
 # Procedimento para criar (react/Vue/Angular)
 Abaixo descrevo instrução para criação do CI/CD que criara a imagem React no IO
-React ```
+```
 name: Deploy React Lab
 
 on:
