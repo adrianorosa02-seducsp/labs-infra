@@ -3,7 +3,7 @@
 ## Linux / WSL / Mac
 A documentação para entender o script abaixo pode ser encontrata no remositório do nvm clicando aqui: https://github.com/nvm-sh/nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-** O Trecho deve ser inserido no script de instalação
+** O Trecho deve ser inserido no script de instalação ver isso
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
