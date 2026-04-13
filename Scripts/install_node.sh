@@ -2,19 +2,12 @@
 # Install Node Version Manager (NVM) and Node.js
 # Autor: [Adriano Rosa] - [13/04/2026]
 
-# Define local para execução da instalação do NVM
-#!/bin/bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
+# "call" do bash 👇
 export NVM_DIR="$HOME/.nvm"
+. "$NVM_DIR/nvm.sh"
 
-if [ ! -d "$NVM_DIR" ]; then
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-fi
-
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
+# agora funciona
 nvm install 24
 nvm use 24
-
-node -v
-npm -v
