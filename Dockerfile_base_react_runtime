@@ -1,0 +1,11 @@
+FROM nginx:alpine
+
+# limpa default
+RUN rm -rf /usr/share/nginx/html/*
+
+# volume onde o CI vai jogar o build
+VOLUME /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

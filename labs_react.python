@@ -1,0 +1,26 @@
+lab01-react:
+  image: ghcr.io/seuuser/inetz-react-runtime:latest
+  volumes:
+    - /var/inetpub/wwwroot/react/lab01:/usr/share/nginx/html
+  networks:
+    - dockermaster
+  deploy:
+    replicas: 0
+    resources:
+      limits:
+        memory: 32M
+      reservations:
+        memory: 16M
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.lab01-react.rule=Host(`lab01.react.inetz.com.br`)"
+      - "traefik.http.routers.lab01-react.entrypoints=websecure"
+      - "traefik.http.routers.lab01-react.tls.certresolver=letsencryptresolver"
+      - "traefik.http.routers.lab01-react.tls=true"
+
+      - "traefik.http.routers.lab01-react-http.rule=Host(`lab01.react.inetz.com.br`)"
+      - "traefik.http.routers.lab01-react-http.entrypoints=web"
+
+      - "traefik.http.services.lab01-react.loadbalancer.server.port=80"
+      - "traefik.docker.network=dockermaster"
