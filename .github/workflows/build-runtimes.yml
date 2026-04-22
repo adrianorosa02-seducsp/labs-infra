@@ -1,0 +1,59 @@
+name: Build Inetz Runtimes
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'images/**' # Dispara se mudar qualquer arquivo dentro da pasta de imagens
+      - '.github/workflows/**'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: 🛒 Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: 🔑 Login no GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # --- BUILD DA IMAGEM PYTHON ---
+      - name: 🐳 Build e Push Python Runtime
+        uses: docker/build-push-action@v5
+        with:
+          context: ./images/python-runtime
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/inetz-python-runtime:latest
+            ghcr.io/${{ github.repository_owner }}/inetz-python-runtime:${{ github.run_number }}
+
+      # --- BUILD DA IMAGEM REACT (SPA) ---
+      - name: 🐳 Build e Push React Runtime
+        uses: docker/build-push-action@v5
+        with:
+          context: ./images/spa-runtime
+          push: true
+          # Aqui geramos tags para as 3 tecnologias usando a mesma imagem base
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/inetz-react-runtime:latest
+            ghcr.io/${{ github.repository_owner }}/inetz-vue-runtime:latest
+            ghcr.io/${{ github.repository_owner }}/inetz-angular-runtime:latest
+            ghcr.io/${{ github.repository_owner }}/inetz-react-runtime:${{ github.run_number }}
+      
+      # --- BUILD DA IMAGEM NODE.JS ---
+      - name: 🐳 Build e Push Node.js Runtime
+        uses: docker/build-push-action@v5
+        with:
+          context: ./images/node-runtime
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/inetz-node-runtime:latest
+            ghcr.io/${{ github.repository_owner }}/inetz-node-runtime:${{ github.run_number }}
