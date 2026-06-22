@@ -1,0 +1,73 @@
+version: "3.8" # Recomendado para Swarm atualizado
+
+services:
+  postgres_app:
+    image: postgres:16
+    volumes:
+      - postgres_app_data:/var/lib/postgresql/data
+    networks:
+      - dockermaster
+    environment:
+      - POSTGRES_DB=appdb
+      - POSTGRES_USER=appuser
+      - POSTGRES_PASSWORD=appsenha
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+  mysql_app:
+    image: mysql:8
+
+    volumes:
+      - mysql_app_data:/var/lib/mysql
+
+    networks:
+      - dockermaster
+
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootsenha
+      - MYSQL_DATABASE=appdb
+      - MYSQL_USER=appuser
+      - MYSQL_PASSWORD=appsenha
+
+    command:
+      - --bind-address=0.0.0.0
+
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  adminer:
+    image: adminer:latest
+    networks:
+      - dockermaster
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=true
+
+        - traefik.docker.network=dockermaster
+
+        - traefik.http.routers.database-adminer.rule=Host(`db.inetz.com.br`)
+        - traefik.http.routers.database-adminer.entrypoints=websecure
+        - traefik.http.routers.database-adminer.tls=true
+        - traefik.http.routers.database-adminer.tls.certresolver=letsencryptresolver
+
+        - traefik.http.routers.database-adminer.service=database-adminer
+
+        - traefik.http.services.database-adminer.loadbalancer.server.port=8080
+
+volumes:
+  postgres_app_data:
+    external: true
+  mysql_app_data:
+    external: true
+
+networks:
+  dockermaster:
+    external: true
+    name: dockermaster

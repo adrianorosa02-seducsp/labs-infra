@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # --- LABORATÓRIO 05: REACT ---
+  lab05-react:
+    image: ghcr.io/adrianorosa02-seducsp/inetz-spa-runtime:latest
+    volumes:
+      - /var/inetpub/wwwroot/react/lab05:/app:ro
+    networks:
+      - dockermaster
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=dockermaster"
+        - "traefik.http.routers.lab05-react.rule=Host(`lab05.react.inetz.com.br`)"
+        - "traefik.http.routers.lab05-react.entrypoints=websecure"
+        - "traefik.http.routers.lab05-react.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.lab05-react.tls=true"
+        - "traefik.http.services.lab05-react.loadbalancer.server.port=8000"
+
+  # --- LABORATÓRIO 05: VUE ---
+  lab05-vue:
+    image: ghcr.io/adrianorosa02-seducsp/inetz-spa-runtime:latest
+    volumes:
+      - /var/inetpub/wwwroot/vue/lab05:/app:ro
+    networks:
+      - dockermaster
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=dockermaster"
+        - "traefik.http.routers.lab05-vue.rule=Host(`lab05.vue.inetz.com.br`)"
+        - "traefik.http.routers.lab05-vue.entrypoints=websecure"
+        - "traefik.http.routers.lab05-vue.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.lab05-vue.tls=true"
+        - "traefik.http.services.lab05-vue.loadbalancer.server.port=8000"
+
+  # --- LABORATÓRIO 05: ANGULAR ---
+  lab05-angular:
+    image: ghcr.io/adrianorosa02-seducsp/inetz-spa-runtime:latest
+    volumes:
+      - /var/inetpub/wwwroot/angular/lab05:/app:ro
+    networks:
+      - dockermaster
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=dockermaster"
+        - "traefik.http.routers.lab05-angular.rule=Host(`lab05.angular.inetz.com.br`)"
+        - "traefik.http.routers.lab05-angular.entrypoints=websecure"
+        - "traefik.http.routers.lab05-angular.tls.certresolver=letsencryptresolver"
+        - "traefik.http.routers.lab05-angular.tls=true"
+        - "traefik.http.services.lab05-angular.loadbalancer.server.port=8000"
+
+networks:
+  dockermaster:
+    external: true
